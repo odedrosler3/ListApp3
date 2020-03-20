@@ -15,6 +15,15 @@ public class User {
         this.groups = groups;
     }
 
+    public User(String phonenumer, String name) {
+        this.phonenumer = phonenumer;
+        this.name = name;
+    }
+
+    public User() {
+
+    }
+
     public String getPhonenumer() {
         return phonenumer;
     }

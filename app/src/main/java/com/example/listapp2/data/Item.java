@@ -8,6 +8,8 @@ public class Item {
     private String desc;
     private Image image;
 
+    public Item() {
+    }
 
     public Item(int id, String name, String desc) {
         this.id = id;

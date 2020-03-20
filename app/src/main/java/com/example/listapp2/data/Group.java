@@ -17,6 +17,8 @@ public class Group {
         this.items = items;
     }
 
+    public Group() {
+    }
 
     public int getId() {
         return Id;
