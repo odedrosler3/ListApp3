@@ -3,6 +3,7 @@ package com.example.listapp2;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -12,6 +13,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.listapp2.data.Contact;
@@ -36,12 +39,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+
 public class MainActivity extends AppCompatActivity {
 
     DatabaseReference usersTable=FirebaseDatabase.getInstance().getReference(); //myDB
     private FirebaseAuth mAuth; //myAuth
     private static final int RC_SIGN_IN = 123;
-    String username="bla";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +57,12 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             // already signed in
+            Intent i = new Intent(getApplicationContext(),HomeActivity.class);
+            startActivity(i);
         } else {
             sign();
         }
+
 
     }
 
@@ -86,22 +95,13 @@ public void sign(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 FirebaseUser user = mAuth.getCurrentUser();
-                if(dataSnapshot.child("users").hasChild(user.getPhoneNumber()))
+                if(!dataSnapshot.child("users").hasChild(user.getPhoneNumber()))
                 {
-                    Context context = getApplicationContext();
-                    CharSequence text = "yes";
-                    int duration = Toast.LENGTH_SHORT;
-
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+                    Dialog();
 
                 }
-                else
-                {
-                    openDialog();
-                    User newuser = new User(user.getPhoneNumber(),username);
-                    usersTable.child("users").child(user.getPhoneNumber()).setValue(newuser);
-                }
+                Intent i = new Intent(getApplicationContext(),HomeActivity.class);
+                startActivity(i);
             }
 
             @Override
@@ -111,19 +111,50 @@ public void sign(){
        usersTable.addListenerForSingleValueEvent(userListener);
 
 
+
     }
 
-    public void openDialog() {
-        NameDialog named = new NameDialog();
-        named.show(getSupportFragmentManager(), "example dialog");
+    String strname="";
+    public void Dialog()
+    {
+        LayoutInflater inflater = this.getLayoutInflater();
+        View view = inflater.inflate(R.layout.layout_dialog, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+        alertDialogBuilder.setView(view);
+
+
+
+        final EditText userInput = (EditText) view
+                .findViewById(R.id.edit_newname);
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",null);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+        Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                strname = userInput.getText().toString();
+                if (strname.matches("")) {
+                    @SuppressLint("RestrictedApi") Context context = getApplicationContext();
+                    CharSequence text = "you must enter name";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                } else {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    User newuser = new User(user.getPhoneNumber(),strname);
+                    usersTable.child("users").child(user.getPhoneNumber()).setValue(newuser);
+                    alertDialog.dismiss();
+                }
+            }
+        });
     }
 
 
-
-
-    public void applyTexts(String username) {
-        username=this.username;
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
