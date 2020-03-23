@@ -59,10 +59,11 @@ public class MainActivity extends AppCompatActivity {
             // already signed in
             Intent i = new Intent(getApplicationContext(),HomeActivity.class);
             startActivity(i);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
         } else {
             sign();
         }
-
 
     }
 
@@ -89,73 +90,6 @@ public void sign(){
 
 }
 
-    public void dbusercheck()
-    {
-        ValueEventListener userListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                FirebaseUser user = mAuth.getCurrentUser();
-                if(!dataSnapshot.child("users").hasChild(user.getPhoneNumber()))
-                {
-                    Dialog();
-
-                }
-                Intent i = new Intent(getApplicationContext(),HomeActivity.class);
-                startActivity(i);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-       usersTable.addListenerForSingleValueEvent(userListener);
-
-
-
-    }
-
-    String strname="";
-    public void Dialog()
-    {
-        LayoutInflater inflater = this.getLayoutInflater();
-        View view = inflater.inflate(R.layout.layout_dialog, null);
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                this);
-        alertDialogBuilder.setView(view);
-
-
-
-        final EditText userInput = (EditText) view
-                .findViewById(R.id.edit_newname);
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK",null);
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.setCancelable(false);
-        alertDialog.show();
-        Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        positiveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                strname = userInput.getText().toString();
-                if (strname.matches("")) {
-                    @SuppressLint("RestrictedApi") Context context = getApplicationContext();
-                    CharSequence text = "you must enter name";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                } else {
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    User newuser = new User(user.getPhoneNumber(),strname);
-                    usersTable.child("users").child(user.getPhoneNumber()).setValue(newuser);
-                    alertDialog.dismiss();
-                }
-            }
-        });
-    }
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -178,14 +112,75 @@ public void sign(){
         }
     }
 
-    public void signOut(View v) {
-        // [START auth_fui_signout]
-        FirebaseAuth.getInstance().signOut();
-        sign();
+    public void dbusercheck()
+    {
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                if(!dataSnapshot.child("users").hasChild(user.getPhoneNumber()))
+                {
+                    Dialog();
+                }
 
-        // [END auth_fui_signout]
+                Intent i = new Intent(getApplicationContext(),HomeActivity.class);
+                startActivity(i);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+       usersTable.addListenerForSingleValueEvent(userListener);
+
+    }
+
+    String strname="";
+    public void Dialog()
+    {
+        LayoutInflater inflater = this.getLayoutInflater();
+        View view = inflater.inflate(R.layout.layout_dialog, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+        alertDialogBuilder.setView(view);
+
+        final EditText userInput = (EditText) view
+                .findViewById(R.id.edit_newname);
+        alertDialogBuilder
+            .setCancelable(false)
+            .setPositiveButton("OK",null);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+
+        Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                strname = userInput.getText().toString();
+                if (strname.matches("")) {
+                    @SuppressLint("RestrictedApi") Context context = getApplicationContext();
+                    CharSequence text = "you must enter name";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                } else {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    User newuser = new User(user.getPhoneNumber(),strname);
+                    usersTable.child("users").child(user.getPhoneNumber()).setValue(newuser);
+                    alertDialog.dismiss();
+                }
+            }
+        });
+    }
 
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(false);
     }
 }
 

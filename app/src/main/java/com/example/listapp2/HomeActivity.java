@@ -61,6 +61,11 @@ public class HomeActivity extends Activity {
         FirebaseAuth.getInstance().signOut();
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         // [END auth_fui_signout]
+    }
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(false);
     }
 }
