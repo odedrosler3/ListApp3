@@ -122,10 +122,11 @@ public void sign(){
                 {
                     Dialog();
                 }
-
-                Intent i = new Intent(getApplicationContext(),HomeActivity.class);
-                startActivity(i);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                else {
+                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                    startActivity(i);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
 
             }
 
@@ -172,6 +173,9 @@ public void sign(){
                     User newuser = new User(user.getPhoneNumber(),strname);
                     usersTable.child("users").child(user.getPhoneNumber()).setValue(newuser);
                     alertDialog.dismiss();
+                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                    startActivity(i);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 }
             }
         });
