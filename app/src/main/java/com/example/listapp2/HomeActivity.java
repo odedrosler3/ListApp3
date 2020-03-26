@@ -56,6 +56,12 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.activity_home);
     }
 
+    public void movetonewitem(View v){
+        Intent i = new Intent(getApplicationContext(), NewItemActivity.class);
+        startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
     public void signOut(View v) {
         // [START auth_fui_signout]
         FirebaseAuth.getInstance().signOut();

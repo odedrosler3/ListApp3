@@ -6,15 +6,29 @@ public class Item {
     private int id;
     private String name;
     private String desc;
-    private Image image;
+    private String imagelimk;
+    public static int countitem=1;
 
-    public Item() {
+    public Item(String namestr, String descstr, String imagelnkstr) {
+    }
+
+    public Item(int id, String name, String desc, String imagelimk) {
+        this.id = id;
+        this.name = name;
+        this.desc = desc;
+        this.imagelimk = imagelimk;
     }
 
     public Item(int id, String name, String desc) {
         this.id = id;
         this.name = name;
         this.desc = desc;
+    }
+
+    public Item(String s, String name, String namestr, String descstr) {
+    }
+
+    public Item(String namestr, String descstr) {
     }
 
     public int getId() {
@@ -41,11 +55,11 @@ public class Item {
         this.desc = desc;
     }
 
-    public Image getImage() {
-        return image;
+    public String getImagelimk() {
+        return imagelimk;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setImagelimk(String imagelimk) {
+        this.imagelimk = imagelimk;
     }
 }
