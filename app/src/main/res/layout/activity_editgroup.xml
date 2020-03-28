@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".group.newgroup">
+    tools:context=".group.editgroup">
+
 
     <Button
         android:id="@+id/addbtn3"
@@ -33,7 +34,7 @@
         app:layout_constraintVertical_bias="0.232" />
 
     <EditText
-        android:id="@+id/editnameg"
+        android:id="@+id/editnamegg"
         android:layout_width="335dp"
         android:layout_height="51dp"
         android:layout_marginTop="84dp"

@@ -3,28 +3,34 @@ package com.example.listapp2.data;
 import java.util.List;
 
 public class Group {
-    private int Id;
+    private Long Id;
     public static int lastId;
     private String Name;
     private List<Contact> contacts;
     private List<Item> items;
 
 
-    public Group(int id, String name, List<Contact> contacts, List<Item> items) {
+    public Group(Long id, String name, List<Contact> contacts, List<Item> items) {
         Id = id;
         Name = name;
         this.contacts = contacts;
         this.items = items;
     }
 
+    public Group(Long id, String name, List<Contact> contacts) {
+        Id = id;
+        Name = name;
+        this.contacts = contacts;
+    }
+
     public Group() {
     }
 
-    public int getId() {
+    public Long getId() {
         return Id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         Id = id;
     }
 

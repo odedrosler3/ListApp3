@@ -17,19 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".group.editgroup"></activity>
         <activity
             android:name="com.onegravity.contactpicker.core.ContactPickerActivity"
             android:enabled="true"
-            android:exported="false" >
-
+            android:exported="false">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".group.newgroup"></activity>
+        <activity android:name=".group.newgroup" />
         <activity android:name=".item.EditItem" />
         <activity android:name=".item.ViewItem" />
         <activity android:name=".MainActivity">

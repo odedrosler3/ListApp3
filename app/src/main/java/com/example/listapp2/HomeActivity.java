@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.listapp2.group.editgroup;
 import com.example.listapp2.group.newgroup;
 import com.example.listapp2.item.EditItem;
 import com.example.listapp2.item.NewItemActivity;
@@ -28,6 +29,12 @@ public class HomeActivity extends Activity {
 
     public void movetonewitem(View v){
         Intent i = new Intent(getApplicationContext(), NewItemActivity.class);
+        startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    public void movetoeditgroup(View v){
+        Intent i = new Intent(getApplicationContext(), editgroup.class);
         startActivity(i);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }

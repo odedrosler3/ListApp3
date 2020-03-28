@@ -10,6 +10,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,24 +27,32 @@ import com.example.listapp2.data.Contact;
 import com.example.listapp2.data.Group;
 import com.example.listapp2.data.Item;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.wafflecopter.multicontactpicker.ContactResult;
 import com.wafflecopter.multicontactpicker.LimitColumn;
 import com.wafflecopter.multicontactpicker.MultiContactPicker;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static java.security.AccessController.getContext;
 
-public class newgroup extends AppCompatActivity {
+public class editgroup extends AppCompatActivity {
 
     int CONTACT_PICKER_REQUEST =15;
     int PERMISSIONS_REQUEST_READ_CONTACTS =10;
@@ -53,32 +63,46 @@ public class newgroup extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     DatabaseReference usersTable= FirebaseDatabase.getInstance().getReference(); //myDB
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String groupid="group9";
+    private Group group;
 
 
 
+    List<Contact> contactlist;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_newgroup);
-        
-        name = findViewById(R.id.editnameg);
+        setContentView(R.layout.activity_editgroup);
+        name = findViewById(R.id.editnamegg);
 
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                group = dataSnapshot.child("users").child("+972545838529").child("groups").child(groupid).getValue(Group.class);
+                name.setText(group.getName());
+                contactlist = group.getContacts();
+                recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                recyclerView.setHasFixedSize(true);
 
-        recyclerView.setHasFixedSize(true);
+                // use a linear layout manager
+                layoutManager = new LinearLayoutManager(getApplicationContext());
+                recyclerView.setLayoutManager(layoutManager);
 
-        // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        final List<Contact> contactlistnull  = new ArrayList<>();
+                // specify an adapter (see also next example)
+                mAdapter = new MyAdaptergroup(contactlist);
+                recyclerView.setAdapter(mAdapter);
 
-        // specify an adapter (see also next example)
-        mAdapter = new MyAdaptergroup(contactlistnull);
-        recyclerView.setAdapter(mAdapter);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        }; usersTable.addListenerForSingleValueEvent(postListener);
 
     }
 
@@ -104,25 +128,25 @@ public class newgroup extends AppCompatActivity {
                 .showPickerForResult(CONTACT_PICKER_REQUEST);
 
     }
-    List<Contact> contactlist;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CONTACT_PICKER_REQUEST){
             if(resultCode == RESULT_OK) {
                 if(contactlist==null){
-                List<ContactResult> results = MultiContactPicker.obtainResult(data);
-                contactlist  = new ArrayList<>();
-                for(int i=0; i<results.size(); i++)
-                {
-                    String name = results.get(i).getDisplayName();
-                    String phone = "+972"+ results.get(i).getPhoneNumbers().get(0).getNumber().substring(1);
+                    List<ContactResult> results = MultiContactPicker.obtainResult(data);
+                    contactlist  = new ArrayList<>();
+                    for(int i=0; i<results.size(); i++)
+                    {
+                        String name = results.get(i).getDisplayName();
+                        String phone = "+972"+ results.get(i).getPhoneNumbers().get(0).getNumber().substring(1);
 
-                    Contact c = new Contact(name, phone);
-                    contactlist.add(c);
-                }
-                mAdapter = new MyAdaptergroup(contactlist);
-                recyclerView.setAdapter(mAdapter);}
+                        Contact c = new Contact(name, phone);
+                        contactlist.add(c);
+                    }
+                    mAdapter = new MyAdaptergroup(contactlist);
+                    recyclerView.setAdapter(mAdapter);}
                 else{
                     List<ContactResult> results = MultiContactPicker.obtainResult(data);
                     for(int i=0; i<results.size(); i++)
@@ -147,22 +171,19 @@ public class newgroup extends AppCompatActivity {
 
         namestr =name.getText().toString();
 
-        Toast.makeText(this, namestr, Toast.LENGTH_SHORT).show();
-
 
         final DocumentReference docRef = db.collection("help").document("help");
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        Long id = task.getResult().getLong("groupid");
-                        Group g = new Group(id,namestr,contactlist);
-                        usersTable.child("users").child("+972545838529").child("groups").child("group"+id).setValue(g);
-                        docRef.update("groupid", id + 1);
-                    }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    Long id = group.getId();
+                    Group g = new Group(id,namestr,contactlist);
+                    usersTable.child("users").child("+972545838529").child("groups").child("group"+id).setValue(g);
+                }
 
-                }});
+            }});
 
-}}
+    }}
 
