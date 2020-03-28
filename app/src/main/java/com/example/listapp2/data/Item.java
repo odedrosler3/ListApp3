@@ -1,41 +1,42 @@
 package com.example.listapp2.data;
 
-import android.media.Image;
+import static java.lang.Long.getLong;
 
 public class Item {
-    private int id;
+    private long id;
     private String name;
     private String desc;
     private String imagelimk;
-    public static int countitem=1;
 
-    public Item(String namestr, String descstr, String imagelnkstr) {
+
+
+
+    public Item(String name, String desc,Long id) {
+        this.id = id;
+        this.name= name;
+        this.desc=desc;
+
     }
 
-    public Item(int id, String name, String desc, String imagelimk) {
+
+    public Item(String name, String desc,long id, String imagelimk) {
         this.id = id;
         this.name = name;
         this.desc = desc;
         this.imagelimk = imagelimk;
     }
 
-    public Item(int id, String name, String desc) {
-        this.id = id;
-        this.name = name;
-        this.desc = desc;
-    }
-
     public Item(String s, String name, String namestr, String descstr) {
     }
 
-    public Item(String namestr, String descstr) {
+    public Item() {
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

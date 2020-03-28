@@ -15,7 +15,6 @@ android {
         vectorDrawables.useSupportLibrary = true // This line here
 
 
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         minSdkVersion 19
     }
@@ -48,14 +47,20 @@ dependencies {
     implementation 'com.github.yalantis:ucrop:2.2.4'
     // FirebaseUI for Cloud Firestore
     implementation 'com.firebaseui:firebase-ui-firestore:6.2.0'
-
+    //implementation 'com.google.api-client:google-api-client:1.23.0'
+    //implementation 'com.google.android.gms:play-services-drive:8.4.0'
     // FirebaseUI for Firebase Auth
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
+    //implementation 'com.google.api-client:google-api-client:1.23.0'
 
     // FirebaseUI for Cloud Storage
     implementation 'com.firebaseui:firebase-ui-storage:6.2.0'
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.google.android.material:material:1.1.0'
+    //implementation 'com.google.android.material:material:1.1.0'
+
+    //   implementation 'com.google.guava:guava:27.0.1-android'
+
+    //  implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
 
 }

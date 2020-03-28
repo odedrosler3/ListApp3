@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ViewItem">
 
-    <EditText
+    <TextView
         android:id="@+id/editname"
         android:layout_width="300dp"
         android:layout_height="49dp"
@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
-    <EditText
+    <TextView
         android:id="@+id/editdescription"
         android:layout_width="299dp"
         android:layout_height="209dp"
@@ -62,50 +62,20 @@
         android:layout_height="163dp"
         android:contentDescription="TODO"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnaddphoto"
-        app:layout_constraintHorizontal_bias="0.629"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editdescription"
-        app:layout_constraintVertical_bias="0.226"
+        app:layout_constraintVertical_bias="0.276"
         app:srcCompat="@drawable/ic_launcher_background" />
 
     <Button
-        android:id="@+id/btnaddphoto"
+        android:id="@+id/editbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="addimage"
-        android:text="add photo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.821"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editdescription"
-        app:layout_constraintVertical_bias="0.23" />
-
-    <Button
-        android:id="@+id/savebtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="save"
-        android:text="save"
+        android:text="edit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-    <Button
-        android:id="@+id/delbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="delimage"
-        android:text="del"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.428"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/btnaddphoto"
-        app:layout_constraintVertical_bias="0.076" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

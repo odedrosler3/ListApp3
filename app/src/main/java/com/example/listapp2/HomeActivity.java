@@ -62,6 +62,18 @@ public class HomeActivity extends Activity {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
+    public void edititem(View v){
+        Intent i = new Intent(getApplicationContext(), EditItem.class);
+        startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    public void movetoViewitem(View v){
+        Intent i = new Intent(getApplicationContext(), ViewItem.class);
+        startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
     public void signOut(View v) {
         // [START auth_fui_signout]
         FirebaseAuth.getInstance().signOut();

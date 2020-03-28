@@ -1,7 +1,11 @@
 package com.example.listapp2;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -16,18 +20,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-
 import com.example.listapp2.data.Item;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -36,44 +39,92 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import static com.firebase.ui.auth.ui.email.RegisterEmailFragment.TAG;
 
-public class NewItemActivity extends Activity {
-
+public class EditItem extends AppCompatActivity {
     EditText desc;
     EditText name;
-    String imagelink ="";
-    String imagepath="";
     ImageView img1;
     Button delbtn;
+    String imagelink ="";
+    String imagepath="";
+    String itemid = "item43";
+    Item item;
+
 
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
     UploadTask uploadTask;
     DatabaseReference usersTable= FirebaseDatabase.getInstance().getReference(); //myDB
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_newitem);
-         name = (EditText) findViewById(R.id.editname);
-         desc = (EditText) findViewById(R.id.editdescription);
+        setContentView(R.layout.activity_edit_item);
+        name =  findViewById(R.id.editname);
+        desc = findViewById(R.id.editdescription);
         img1 = findViewById(R.id.imageView);
         delbtn = findViewById(R.id.delbtn);
 
-    }
 
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+        public void onDataChange(final DataSnapshot dataSnapshot) {
+            // Get Post object and use the values to update the UI
+            item = dataSnapshot.child("users").child("+972545838529").child("groups").child("items").child(itemid).getValue(Item.class);
+            name.setText(item.getName());
+            desc.setText(item.getDesc());
+            if (item.getImagelimk()!=null)
+            {
+                delbtn.setVisibility(View.VISIBLE);
+                img1.setVisibility(View.VISIBLE);
+                String imgid=item.getImagelimk();
+                StorageReference imageRef = storageRef.child("/images/"+imgid);
+                String ext = imgid.substring(imgid.lastIndexOf("."));
+                final long ONE_MEGABYTE = 1024 * 1024;
+                try {
+                    File localFile = File.createTempFile("images", ext);
+                    imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap myBitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                            img1.setImageBitmap(myBitmap);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+        }
+    }; usersTable.addListenerForSingleValueEvent(postListener);
+
+
+
+}
     public void delimage(View v){
         delbtn.setVisibility(View.INVISIBLE);
         img1.setVisibility(View.INVISIBLE);
         imagepath="";
+        item.setImagelimk(null);
 
 
     }
@@ -84,27 +135,32 @@ public class NewItemActivity extends Activity {
                 .compress(1024)			//Final image size will be less than 1 MB(Optional)
                 .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
                 .start();
+
+
     }
+
     File img;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            if (resultCode == RESULT_OK) {
-                imagepath=data.getData().getPath();
-                img = new File(imagepath);
-                Bitmap myBitmap = BitmapFactory.decodeFile(img.getAbsolutePath());
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            delbtn.setVisibility(View.VISIBLE);
+            img1.setVisibility(View.VISIBLE);
+            img1.setImageBitmap(null);
+            imagepath = data.getData().getPath();
+            img = new File(imagepath);
+            Bitmap myBitmap = BitmapFactory.decodeFile(img.getAbsolutePath());
 
-                ImageView myImage = (ImageView) findViewById(R.id.imageView);
+            ImageView myImage = (ImageView) findViewById(R.id.imageView);
 
-                myImage.setImageBitmap(myBitmap);
-                delbtn.setVisibility(View.VISIBLE);
-                img1.setVisibility(View.VISIBLE);
+            myImage.setImageBitmap(myBitmap);
 
-            } else if (resultCode == ImagePicker.RESULT_ERROR) {
-                Toast.makeText(this, ImagePicker.Companion.getError(getIntent()), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
-            }
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+            Toast.makeText(this, ImagePicker.Companion.getError(getIntent()), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -174,7 +230,7 @@ public class NewItemActivity extends Activity {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 item.setImagelimk(imgID);
-                                usersTable.child("users").child("+972545838529").child("groups").child("items").child("item"+Long.toString(item.getId())).setValue(item);
+                                usersTable.child("users").child("+972545838529").child("groups").child("items").child(itemid).setValue(item);
 
                             }
                         });}
@@ -190,47 +246,33 @@ public class NewItemActivity extends Activity {
     String descstr;
     String namestr;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void save(View v) throws ExecutionException, InterruptedException {
         setContentView(R.layout.activity_newitem);
         if(imagepath.matches("")) {
             namestr = name.getText().toString();
             descstr = desc.getText().toString();
 
-            final DocumentReference docRef = db.collection("help").document("help");
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Item item = new Item(namestr, descstr, task.getResult().getLong("itemid"));
-                            usersTable.child("users").child("+972545838529").child("groups").child("items").child("item"+Long.toString(item.getId())).setValue(item);
-                            docRef.update("itemid", item.getId()+1);
-                        }
+                        item.setName(namestr);
+                        item.setDesc(descstr);
+            usersTable.child("users").child("+972545838529").child("groups").child("items").child(itemid).setValue(item);
 
-                    }});
-            }
+
+        }
         else
         {
             namestr = name.getText().toString();
             descstr = desc.getText().toString();
 
-            final DocumentReference docRef = db.collection("help").document("help");
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        Item item = new Item(namestr, descstr, task.getResult().getLong("itemid"));
-                        docRef.update("itemid", item.getId()+1);
+                        item.setName(namestr);
+                        item.setDesc(descstr);
+
                         try {
                             upload(item);
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
-                    }
 
-                }});
         }
 
 
@@ -238,6 +280,5 @@ public class NewItemActivity extends Activity {
 
 
     }
-
 
 }
