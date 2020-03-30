@@ -6,7 +6,7 @@ public class Item {
     private long id;
     private String name;
     private String desc;
-    private String imagelimk;
+    private String imagelink;
 
 
 
@@ -19,11 +19,11 @@ public class Item {
     }
 
 
-    public Item(String name, String desc,long id, String imagelimk) {
+    public Item(String name, String desc,long id, String imagelink) {
         this.id = id;
         this.name = name;
         this.desc = desc;
-        this.imagelimk = imagelimk;
+        this.imagelink = imagelink;
     }
 
     public Item(String s, String name, String namestr, String descstr) {
@@ -56,11 +56,11 @@ public class Item {
         this.desc = desc;
     }
 
-    public String getImagelimk() {
-        return imagelimk;
+    public String getImagelink() {
+        return imagelink;
     }
 
-    public void setImagelimk(String imagelimk) {
-        this.imagelimk = imagelimk;
+    public void setImagelink(String imagelink) {
+        this.imagelink = imagelink;
     }
 }

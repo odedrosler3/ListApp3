@@ -3,35 +3,61 @@ package com.example.listapp2.data;
 import java.util.List;
 
 public class Group {
-    private Long Id;
+    private Long id;
     public static int lastId;
-    private String Name;
+    private String name;
     private List<Contact> contacts;
     private List<Item> items;
+    private String admin;
 
-
-    public Group(Long id, String name, List<Contact> contacts, List<Item> items) {
-        Id = id;
-        Name = name;
-        this.contacts = contacts;
-        this.items = items;
+    public String getAdmin() {
+        return admin;
     }
 
-    public Group(Long id, String name, List<Contact> contacts) {
-        Id = id;
-        Name = name;
+
+
+    public Group(Group g) {
+        this.id = g.getid();
+        this.name = g.getname();
+        this.contacts = g.getContacts();
+        this.items = g.getItems();
+        this.admin = g.getAdmin();
+    }
+
+    public Group(Long id, String name, List<Contact> contacts, List<Item> items, String admin) {
+        this.id = id;
+        this.name = name;
         this.contacts = contacts;
+        this.items = items;
+        this.admin = admin;
+    }
+
+    public Group(Long id, String name, List<Contact> contacts, String admin) {
+        this.id = id;
+        this.name = name;
+        this.contacts = contacts;
+        this.admin = admin;
+    }
+
+    public Group(Long id, String name, String admin) {
+        this.id = id;
+        this.name = name;
+        this.admin = admin;
+    }
+    public Group(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Group() {
     }
 
-    public Long getId() {
-        return Id;
+    public Long getid() {
+        return id;
     }
 
-    public void setId(Long id) {
-        Id = id;
+    public void setid(Long id) {
+        this.id = id;
     }
 
     public static int getLastId() {
@@ -42,12 +68,12 @@ public class Group {
         Group.lastId = lastId;
     }
 
-    public String getName() {
-        return Name;
+    public String getname() {
+        return name;
     }
 
-    public void setName(String name) {
-        Name = name;
+    public void setname(String name) {
+        this.name = name;
     }
 
     public List<Contact> getContacts() {

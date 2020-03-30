@@ -6,41 +6,40 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.example.listapp2.MainActivity;
+import com.example.listapp2.NewHome.NewHomeActivity;
 import com.example.listapp2.R;
 import com.example.listapp2.data.Contact;
 import com.example.listapp2.data.Group;
-import com.example.listapp2.data.Item;
+import com.example.listapp2.itemlist.itemlist;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.Gson;
 import com.wafflecopter.multicontactpicker.ContactResult;
 import com.wafflecopter.multicontactpicker.LimitColumn;
 import com.wafflecopter.multicontactpicker.MultiContactPicker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import static java.security.AccessController.getContext;
 
 public class newgroup extends AppCompatActivity {
 
@@ -49,10 +48,15 @@ public class newgroup extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private EditText name;
+    private String userphone;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     DatabaseReference usersTable= FirebaseDatabase.getInstance().getReference(); //myDB
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth; //myAuth
+    private String extgroupid;
+    List<Contact> contactlist;
+
 
 
 
@@ -62,23 +66,50 @@ public class newgroup extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newgroup);
-        
+        extgroupid=getIntent().getStringExtra("idgroup");
         name = findViewById(R.id.editnameg);
+        mAuth = FirebaseAuth.getInstance();
 
-
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        userphone = mAuth.getCurrentUser().getPhoneNumber();
+        recyclerView = (RecyclerView) findViewById(R.id.myRecycler);
 
         recyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+
+
+
+        if(extgroupid==null){
+
         final List<Contact> contactlistnull  = new ArrayList<>();
 
-        // specify an adapter (see also next example)
         mAdapter = new MyAdaptergroup(contactlistnull);
-        recyclerView.setAdapter(mAdapter);
+        recyclerView.setAdapter(mAdapter);}
+        else{
+            ValueEventListener postListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(final DataSnapshot dataSnapshot) {
+                    // Get Post object and use the values to update the UI
+                        Group g = dataSnapshot.child("groups").child(extgroupid).getValue(Group.class);
+                        name.setText(g.getname());
+                        contactlist = g.getContacts();
+                    mAdapter = new MyAdaptergroup(contactlist);
+                    recyclerView.setAdapter(mAdapter);
 
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+
+                };
+                usersTable.addListenerForSingleValueEvent(postListener);
+
+
+    }
 
     }
 
@@ -104,7 +135,6 @@ public class newgroup extends AppCompatActivity {
                 .showPickerForResult(CONTACT_PICKER_REQUEST);
 
     }
-    List<Contact> contactlist;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -141,28 +171,87 @@ public class newgroup extends AppCompatActivity {
         }
     }
     String namestr;
+    Group g;
+    Long id;
     public void save(View v) throws ExecutionException, InterruptedException {
         setContentView(R.layout.activity_newgroup);
 
 
         namestr =name.getText().toString();
 
-        Toast.makeText(this, namestr, Toast.LENGTH_SHORT).show();
-
 
         final DocumentReference docRef = db.collection("help").document("help");
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            final FirebaseFirestore db = FirebaseFirestore.getInstance();
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
-                        Long id = task.getResult().getLong("groupid");
-                        Group g = new Group(id,namestr,contactlist);
-                        usersTable.child("users").child("+972545838529").child("groups").child("group"+id).setValue(g);
-                        docRef.update("groupid", id + 1);
+                        if(extgroupid==null) {
+                             id = task.getResult().getLong("groupid");
+                            g = new Group(id, namestr, contactlist, userphone);
+                            usersTable.child("groups").child("group" + id).setValue(g);
+                            docRef.update("groupid", id + 1);
+                        }
+                        else{
+                            id = Long.parseLong(extgroupid.substring(5));
+                            g = new Group(id, namestr, contactlist, userphone);
+                            usersTable.child("groups").child("group" + id).setValue(g);
+                        }
+                        if(contactlist!=null){
+                        for(int i = 0; i<contactlist.size(); i++)
+                        {
+                            final String phone = contactlist.get(i).getPhonenumber();
+                            final DocumentReference groupsRef = db.collection("groups").document(phone);
+                            groupsRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        if(task.getResult().exists()) {
+                                            db.collection("groups").document(phone).update("groups", FieldValue.arrayUnion("group"+id));
+                                        }
+                                        else{
+                                            Map<String, Object> docData = new HashMap<>();
+                                            docData.put("groups", Arrays.asList("group"+id));
+                                            Task<Void> future = db.collection("groups").document(phone).set(docData);
+                                        }
+
+                                        }
+                                    }
+                                });
+
+                        }}
                     }
 
+                        Intent i = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
+                        i.putExtra("idgroup","group"+id);
+                        startActivity(i); finish();
                 }});
 
-}}
+}
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) < 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void onBackPressed() {
+
+        if(extgroupid==null){
+        Intent i = new Intent(getApplicationContext(), NewHomeActivity.class);
+
+        startActivity(i); finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);}
+        else{
+            finish();
+        }
+
+    }
+
+}
 

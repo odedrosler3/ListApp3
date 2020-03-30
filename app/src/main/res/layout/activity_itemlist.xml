@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".group.editgroup">
-
+    tools:context=".itemlist.itemlist">
 
     <Button
         android:id="@+id/addbtn3"
@@ -23,8 +22,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/myRecycler"
-        android:layout_width="406dp"
-        android:layout_height="302dp"
+        android:layout_width="403dp"
+        android:layout_height="294dp"
         android:layout_marginBottom="248dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,26 +32,15 @@
         app:layout_constraintTop_toBottomOf="@+id/editname"
         app:layout_constraintVertical_bias="0.232" />
 
-    <EditText
-        android:id="@+id/editnamegg"
-        android:layout_width="335dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="84dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/groupname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
-        android:text="enter group name:"
+        android:text="name"
+        android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/editname"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/editbtnn"
         app:layout_constraintHorizontal_bias="0.128"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -62,7 +50,7 @@
         android:id="@+id/items"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="contacts"
+        android:text="items"
         app:layout_constraintBottom_toTopOf="@+id/myRecycler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -82,5 +70,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/myRecycler"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/editbtnn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="28dp"
+        android:onClick="edit"
+        android:text="edit"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

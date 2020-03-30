@@ -5,9 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.listapp2.group.editgroup;
+import com.example.listapp2.NewHome.NewHomeActivity;
 import com.example.listapp2.group.newgroup;
-import com.example.listapp2.item.EditItem;
 import com.example.listapp2.item.NewItemActivity;
 import com.example.listapp2.item.ViewItem;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,33 +26,9 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.activity_home);
     }
 
-    public void movetonewitem(View v){
-        Intent i = new Intent(getApplicationContext(), NewItemActivity.class);
-        startActivity(i);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
 
-    public void movetoeditgroup(View v){
-        Intent i = new Intent(getApplicationContext(), editgroup.class);
-        startActivity(i);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-
-    public void movetonewgroup(View v){
-        Intent i = new Intent(getApplicationContext(), newgroup.class);
-        startActivity(i);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-
-
-    public void edititem(View v){
-        Intent i = new Intent(getApplicationContext(), EditItem.class);
-        startActivity(i);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-
-    public void movetoViewitem(View v){
-        Intent i = new Intent(getApplicationContext(), ViewItem.class);
+    public void movetonewhome(View v){
+        Intent i = new Intent(getApplicationContext(), NewHomeActivity.class);
         startActivity(i);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
@@ -68,6 +43,9 @@ public class HomeActivity extends Activity {
     }
     @Override
     public void onBackPressed() {
-        moveTaskToBack(false);
+
+        moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(1);
     }
 }

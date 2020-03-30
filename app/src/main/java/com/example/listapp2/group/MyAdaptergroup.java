@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.listapp2.R;
 import com.example.listapp2.data.Contact;
-import com.wafflecopter.multicontactpicker.ContactResult;
 
 import java.util.List;
 
@@ -30,8 +29,8 @@ public class MyAdaptergroup extends RecyclerView.Adapter<MyAdaptergroup.MyViewHo
         public MyViewHolder(View v) {
             super(v);
 
-            nameTextView = (TextView) itemView.findViewById(R.id.contact_name);
-            delButton = (Button) itemView.findViewById(R.id.delbtn);
+            nameTextView = (TextView) itemView.findViewById(R.id.list_name);
+            delButton = (Button) itemView.findViewById(R.id.delbtnnn);
         }
     }
 

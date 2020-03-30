@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,24 +23,31 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.listapp2.R;
 import com.example.listapp2.data.Item;
+import com.example.listapp2.itemlist.itemlist;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.reflect.TypeToken;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.firebase.ui.auth.ui.email.RegisterEmailFragment.TAG;
@@ -48,26 +56,74 @@ public class NewItemActivity extends Activity {
 
     EditText desc;
     EditText name;
-    String imagelink ="";
     String imagepath="";
     ImageView img1;
     Button delbtn;
+    String groupid;
+    String liststring;
+    String extiditem;
+    String itemstring;
 
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
+
     UploadTask uploadTask;
     DatabaseReference usersTable= FirebaseDatabase.getInstance().getReference(); //myDB
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    public static <T> T convertStringToObj(String strObj, Class<T> classOfT) {
+        //convert string json to object
+        return new Gson().fromJson(strObj, (Type) classOfT);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_newitem);
          name = (EditText) findViewById(R.id.editname);
          desc = (EditText) findViewById(R.id.editdescription);
         img1 = findViewById(R.id.imageView);
         delbtn = findViewById(R.id.delbtn);
+        groupid=getIntent().getStringExtra("idgroup");
+        extiditem=getIntent().getStringExtra("iditem");
+        liststring =getIntent().getStringExtra("liststring");
+        itemstring = getIntent().getStringExtra("itemasstring");
+        Item extitem  = convertStringToObj(itemstring, Item.class);
+        if(extitem!=null){
+
+                    name.setText(extitem.getName());
+                    desc.setText(extitem.getDesc());
+                    if(extitem.getImagelink()!=null){
+                            String imgid = extitem.getImagelink();
+                            StorageReference imageRef = storageRef.child("/images/" + imgid);
+                            String ext = imgid.substring(imgid.lastIndexOf("."));
+                            final long ONE_MEGABYTE = 1024 * 1024;
+                            try {
+                                File localFile = File.createTempFile("images", ext);
+                                imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                    @Override
+                                    public void onSuccess(byte[] bytes) {
+                                        Bitmap myBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                        img1.setImageBitmap(myBitmap);
+                                        delbtn.setVisibility(View.VISIBLE);
+                                        img1.setVisibility(View.VISIBLE);
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Handle any errors
+                                    }
+                                });
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+                }
+
 
     }
 
@@ -75,8 +131,6 @@ public class NewItemActivity extends Activity {
         delbtn.setVisibility(View.INVISIBLE);
         img1.setVisibility(View.INVISIBLE);
         imagepath="";
-
-
     }
 
     public void addimage(View v){
@@ -161,25 +215,43 @@ public class NewItemActivity extends Activity {
                         Uri file = Uri.fromFile(img);
                         String ext = file.getPath().substring(file.getPath().lastIndexOf("."));
                         StorageReference imagesRef = storage.getReference().child("/images");
-                        imgID = ("IMG"+task.getResult().getLong("imageid")+ext);
+                        imgID = ("IMG" + task.getResult().getLong("imageid") + ext);
                         StorageReference thisimg = imagesRef.child(imgID);
                         uploadTask = thisimg.putFile(file);
 
-                        docRef.update("imageid",task.getResult().getLong("imageid")+1);
-                        uploadTask.addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle unsuccessful uploads
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                item.setImagelimk(imgID);
-                                usersTable.child("users").child("+972545838529").child("groups").child("items").child("item"+Long.toString(item.getId())).setValue(item);
+                        if (extiditem != null) {
+                            item.setImagelink(imgID);
+                            String itemasstring = convertObjToString(item);
+                            Intent i = new Intent(getApplicationContext(), itemlist.class);
+                            i.putExtra("itemstring", itemasstring);
+                            i.putExtra("liststring", liststring);
+                            i.putExtra("idgroup", groupid);
+                            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(i); finish();
 
-                            }
-                        });}
 
+                        } else {
+                            docRef.update("imageid", task.getResult().getLong("imageid") + 1);
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    item.setImagelink(imgID);
+                                    String itemasstring = convertObjToString(item);
+                                    Intent i = new Intent(getApplicationContext(), itemlist.class);
+                                    i.putExtra("itemstring", itemasstring);
+                                    i.putExtra("liststring", liststring);
+                                    i.putExtra("idgroup", groupid);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i); finish();
+                                }
+                            });
+                        }
+                    }
                 }});
         }
 
@@ -203,10 +275,31 @@ public class NewItemActivity extends Activity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
+
+                            if (extiditem != null) {
+                                Item item = new Item(namestr, descstr, task.getResult().getLong("itemid"));
+                                String itemasstring = convertObjToString(item);
+                                Intent i = new Intent(getApplicationContext(), itemlist.class);
+                                i.putExtra("itemstring", itemasstring);
+                                i.putExtra("liststring", liststring);
+                                i.putExtra("idgroup", groupid);
+                                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(i); finish();
+
+
+                            } else {
+
                             Item item = new Item(namestr, descstr, task.getResult().getLong("itemid"));
-                            usersTable.child("users").child("+972545838529").child("groups").child("items").child("item"+Long.toString(item.getId())).setValue(item);
+                            String itemasstring = convertObjToString(item);
+                            Intent i = new Intent(getApplicationContext(), itemlist.class);
+                            i.putExtra("itemstring",itemasstring);
+                            i.putExtra("liststring",liststring);
+                            i.putExtra("idgroup",groupid);
+                            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             docRef.update("itemid", item.getId()+1);
-                        }
+                                startActivity(i); finish();
+
+                        }}
 
                     }});
             }
@@ -233,12 +326,41 @@ public class NewItemActivity extends Activity {
 
                 }});
         }
+    }
 
+    public static String convertObjToString(Object clsObj) {
+        //convert object  to string json
+        String jsonSender = new Gson().toJson(clsObj, new TypeToken<Object>() {
+        }.getType());
+        return jsonSender;
+    }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) < 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+        }
 
+        return super.onKeyDown(keyCode, event);
+    }
 
+    public void onBackPressed() {
+
+        if(extiditem==null){
+            Intent i = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
+            i.putExtra("iditem",extiditem);
+            i.putExtra("liststring",liststring);
+            i.putExtra("idgroup",groupid);
+            startActivity(i); finish();;
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }else{
+            finish();
+        }
 
     }
+
 
 
 }

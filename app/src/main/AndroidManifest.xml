@@ -17,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".group.editgroup"></activity>
+        <activity android:name=".itemlist.itemlist"></activity>
+        <activity android:name=".NewHome.NewHomeActivity" />
         <activity
             android:name="com.onegravity.contactpicker.core.ContactPickerActivity"
             android:enabled="true"
@@ -28,7 +29,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".group.newgroup" />
-        <activity android:name=".item.EditItem" />
         <activity android:name=".item.ViewItem" />
         <activity android:name=".MainActivity">
             <intent-filter>
