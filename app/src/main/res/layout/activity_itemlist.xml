@@ -17,31 +17,27 @@
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/myRecycler"
-        app:layout_constraintVertical_bias="0.505"
+        app:layout_constraintVertical_bias="0.805"
         tools:text="save" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/myRecycler"
-        android:layout_width="403dp"
-        android:layout_height="294dp"
-        android:layout_marginBottom="248dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="401dp"
+        android:layout_height="364dp"
+        android:layout_marginTop="120dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editname"
-        app:layout_constraintVertical_bias="0.232" />
+        app:layout_constraintTop_toBottomOf="@+id/groupname" />
 
     <TextView
         android:id="@+id/groupname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="36dp"
         android:text="name"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/editname"
         app:layout_constraintEnd_toStartOf="@+id/editbtnn"
-        app:layout_constraintHorizontal_bias="0.128"
+        app:layout_constraintHorizontal_bias="0.163"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
@@ -55,21 +51,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editname"
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/addbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="41dp"
         android:onClick="add"
         android:text="add"
         app:layout_constraintBottom_toTopOf="@+id/addbtn3"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/myRecycler"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/editbtnn"
@@ -82,5 +79,16 @@
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textcontacts"
+        android:layout_width="398dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:text="only me"
+        app:layout_constraintBottom_toTopOf="@+id/myRecycler"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/groupname"
+        app:layout_constraintVertical_bias="0.212" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

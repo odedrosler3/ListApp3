@@ -13,7 +13,11 @@ android {
         resConfigs "he" // And any other languages you support
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true // This line here
-
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         minSdkVersion 19
@@ -64,6 +68,12 @@ dependencies {
     //   implementation 'com.google.guava:guava:27.0.1-android'
 
     //  implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+
+
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.6.3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.6.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
+    implementation 'org.projectlombok:lombok:1.16.6'
 
 
 }

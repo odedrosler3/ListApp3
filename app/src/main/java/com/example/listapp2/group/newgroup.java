@@ -65,6 +65,9 @@ public class newgroup extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
         setContentView(R.layout.activity_newgroup);
         extgroupid=getIntent().getStringExtra("idgroup");
         name = findViewById(R.id.editnameg);
@@ -76,7 +79,7 @@ public class newgroup extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
 
 
@@ -88,9 +91,7 @@ public class newgroup extends AppCompatActivity {
         mAdapter = new MyAdaptergroup(contactlistnull);
         recyclerView.setAdapter(mAdapter);}
         else{
-            ValueEventListener postListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(final DataSnapshot dataSnapshot) {
+
                     // Get Post object and use the values to update the UI
                         Group g = dataSnapshot.child("groups").child(extgroupid).getValue(Group.class);
                         name.setText(g.getname());
@@ -98,8 +99,7 @@ public class newgroup extends AppCompatActivity {
                     mAdapter = new MyAdaptergroup(contactlist);
                     recyclerView.setAdapter(mAdapter);
 
-                }
-
+                }}
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -109,7 +109,7 @@ public class newgroup extends AppCompatActivity {
                 usersTable.addListenerForSingleValueEvent(postListener);
 
 
-    }
+
 
     }
 
@@ -221,10 +221,14 @@ public class newgroup extends AppCompatActivity {
 
                         }}
                     }
-
+                    if(extgroupid==null){
                         Intent i = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
                         i.putExtra("idgroup","group"+id);
-                        startActivity(i); finish();
+                        startActivity(i); finish();}
+                    else {
+                    Intent i = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
+                    i.putExtra("idgroup",extgroupid);
+                    startActivity(i); finish();}
                 }});
 
 }

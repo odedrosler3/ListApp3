@@ -18,7 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".itemlist.itemlist"></activity>
-        <activity android:name=".NewHome.NewHomeActivity" />
+        <activity android:name=".NewHome.NewHomeActivity">
+        </activity>
         <activity
             android:name="com.onegravity.contactpicker.core.ContactPickerActivity"
             android:enabled="true"

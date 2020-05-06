@@ -22,7 +22,7 @@ public class MyAdaptermylist extends RecyclerView.Adapter<MyAdaptermylist.MyView
     private List<Group> groupslist;
     private Context con;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private String phone = mAuth.getCurrentUser().getPhoneNumber();
+    private String phone;
 
 
     // Provide a reference to the views for each data item
@@ -43,6 +43,8 @@ public class MyAdaptermylist extends RecyclerView.Adapter<MyAdaptermylist.MyView
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public MyAdaptermylist(Context con,List<Group> groupslist) {
+        if(mAuth.getCurrentUser()!=null)
+            phone = mAuth.getCurrentUser().getPhoneNumber();
         this.con = con;
         this.groupslist = groupslist;
     }

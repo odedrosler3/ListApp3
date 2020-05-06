@@ -1,13 +1,15 @@
 package com.example.listapp2.data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Group {
     private Long id;
     public static int lastId;
     private String name;
     private List<Contact> contacts;
-    private List<Item> items;
+    private HashMap<String, Item> items;
     private String admin;
 
     public String getAdmin() {
@@ -24,7 +26,7 @@ public class Group {
         this.admin = g.getAdmin();
     }
 
-    public Group(Long id, String name, List<Contact> contacts, List<Item> items, String admin) {
+    public Group(Long id, String name, List<Contact> contacts, HashMap<String, Item> items, String admin) {
         this.id = id;
         this.name = name;
         this.contacts = contacts;
@@ -84,11 +86,11 @@ public class Group {
         this.contacts = contacts;
     }
 
-    public List<Item> getItems() {
+    public HashMap<String, Item> getItems() {
         return items;
     }
 
-    public void setItems(List<Item> items) {
+    public void setItems(HashMap<String, Item> items) {
         this.items = items;
     }
 

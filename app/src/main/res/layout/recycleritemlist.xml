@@ -15,7 +15,7 @@
         tools:layout_editor_absoluteX="3dp">
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/imageView222"
             android:layout_width="3dp"
             android:layout_height="44dp"
             android:layout_weight="1"

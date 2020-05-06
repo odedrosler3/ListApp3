@@ -25,10 +25,13 @@ import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class MyAdapteritem extends RecyclerView.Adapter<MyAdapteritem.MyViewHolder> {
-    private List<Item> itemlist;
+    private HashMap<String, Item> itemlist;
     private Context con;
     private String id;
 
@@ -49,12 +52,12 @@ public class MyAdapteritem extends RecyclerView.Adapter<MyAdapteritem.MyViewHold
             super(v);
             nameTextView = (TextView) itemView.findViewById(R.id.list_name);
             delButton = (Button) itemView.findViewById(R.id.delbtn);
-            img = itemView.findViewById(R.id.imageView2);
+            img = itemView.findViewById(R.id.imageView222);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapteritem(String groupid,Context con, List<Item> itemlist) {
+    public MyAdapteritem(String groupid,Context con, HashMap<String, Item> itemlist) {
         this.con = con;
         this.itemlist = itemlist;
         this.id=groupid;
@@ -77,7 +80,10 @@ public class MyAdapteritem extends RecyclerView.Adapter<MyAdapteritem.MyViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
-        Item c = itemlist.get(position);
+        final ArrayList<Item> values = new ArrayList<>(itemlist.values());
+        final List<String> keys = new ArrayList<>(itemlist.keySet());
+        Item c;
+         c = values.get(position);
         TextView name = holder.nameTextView;
         Button del = holder.delButton;
         final ImageView img = holder.img;
@@ -113,9 +119,12 @@ public class MyAdapteritem extends RecyclerView.Adapter<MyAdapteritem.MyViewHold
 
             @Override
             public void onClick(View v) {
-                itemlist.remove(position);
-                notifyItemRemoved(position);
+
+                itemlist.remove(keys.get(position));
                 notifyDataSetChanged();
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, itemlist.size());
+
             }
 
         });
@@ -125,11 +134,11 @@ public class MyAdapteritem extends RecyclerView.Adapter<MyAdapteritem.MyViewHold
             @Override
             public void onClick(View v) {
 
-                final Item item = itemlist.get(position);
+                final Item item = values.get(position);
                 String  itemstring = convertObjToString(item);
                 Intent i = new Intent(con, com.example.listapp2.item.ViewItem.class);
                 i.putExtra("idgroup",id);
-                i.putExtra("iditem",item.getId());
+                i.putExtra("itemid","item"+item.getId());
                 i.putExtra("itemasstring",itemstring);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 con.startActivity(i);

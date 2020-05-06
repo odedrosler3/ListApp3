@@ -30,11 +30,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.common.reflect.TypeToken;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,7 +44,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.firebase.ui.auth.ui.email.RegisterEmailFragment.TAG;
@@ -84,7 +80,7 @@ public class NewItemActivity extends Activity {
         setContentView(R.layout.activity_newitem);
          name = (EditText) findViewById(R.id.editname);
          desc = (EditText) findViewById(R.id.editdescription);
-        img1 = findViewById(R.id.imageView);
+        img1 = findViewById(R.id.imageView111);
         delbtn = findViewById(R.id.delbtn);
         groupid=getIntent().getStringExtra("idgroup");
         extiditem=getIntent().getStringExtra("iditem");
@@ -149,7 +145,7 @@ public class NewItemActivity extends Activity {
                 img = new File(imagepath);
                 Bitmap myBitmap = BitmapFactory.decodeFile(img.getAbsolutePath());
 
-                ImageView myImage = (ImageView) findViewById(R.id.imageView);
+                ImageView myImage = (ImageView) findViewById(R.id.imageView111);
 
                 myImage.setImageBitmap(myBitmap);
                 delbtn.setVisibility(View.VISIBLE);
@@ -283,6 +279,7 @@ public class NewItemActivity extends Activity {
                                 i.putExtra("itemstring", itemasstring);
                                 i.putExtra("liststring", liststring);
                                 i.putExtra("idgroup", groupid);
+                                i.putExtra("itemid", "item"+item.getId());
                                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(i); finish();
 
@@ -295,6 +292,7 @@ public class NewItemActivity extends Activity {
                             i.putExtra("itemstring",itemasstring);
                             i.putExtra("liststring",liststring);
                             i.putExtra("idgroup",groupid);
+                            i.putExtra("itemid", "item"+item.getId());
                             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             docRef.update("itemid", item.getId()+1);
                                 startActivity(i); finish();

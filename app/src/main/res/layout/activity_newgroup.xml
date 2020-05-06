@@ -14,23 +14,21 @@
         android:text="save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/myRecycler"
-        app:layout_constraintVertical_bias="0.505"
+        app:layout_constraintVertical_bias="0.73"
         tools:text="save" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/myRecycler"
-        android:layout_width="406dp"
-        android:layout_height="302dp"
-        android:layout_marginBottom="248dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="410dp"
+        android:layout_height="363dp"
+        android:layout_marginTop="28dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editname"
-        app:layout_constraintVertical_bias="0.232" />
+        app:layout_constraintTop_toBottomOf="@+id/editnameg" />
 
     <EditText
         android:id="@+id/editnameg"
@@ -40,9 +38,12 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Name"
+        app:layout_constraintBottom_toTopOf="@+id/myRecycler"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.368"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/groupname"
@@ -50,9 +51,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         android:text="enter group name:"
-        app:layout_constraintBottom_toTopOf="@+id/editname"
+        app:layout_constraintBottom_toTopOf="@+id/editnameg"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.128"
+        app:layout_constraintHorizontal_bias="0.094"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
@@ -66,7 +67,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editname"
+        app:layout_constraintTop_toBottomOf="@+id/editnameg"
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
@@ -78,8 +79,9 @@
         android:text="add"
         app:layout_constraintBottom_toTopOf="@+id/addbtn3"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/myRecycler"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

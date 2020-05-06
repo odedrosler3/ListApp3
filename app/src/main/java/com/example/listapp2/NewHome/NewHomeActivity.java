@@ -5,12 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.listapp2.HomeActivity;
+import com.example.listapp2.MainActivity;
 import com.example.listapp2.R;
 import com.example.listapp2.data.Group;
 import com.example.listapp2.data.Item;
@@ -111,7 +114,7 @@ public class NewHomeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
 
-        }; usersTable.addListenerForSingleValueEvent(postListener);
+        }; usersTable.addValueEventListener(postListener);
 
     }
 
@@ -131,8 +134,19 @@ public class NewHomeActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    public void signOut(View v) {
+        // [START auth_fui_signout]
+        FirebaseAuth.getInstance().signOut();
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        // [END auth_fui_signout]
+    }
+
     public void onBackPressed() {
         finish();
-
+        android.os.Process.killProcess(android.os.Process.myPid());
+        this.finishAffinity();
+        System.exit(1);
     }
 }

@@ -18,6 +18,7 @@ import com.example.listapp2.R;
 import com.example.listapp2.data.Item;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,21 +59,27 @@ public class ViewItem extends AppCompatActivity {
         //convert string json to object
         return new Gson().fromJson(strObj, (Type) classOfT);
     }
+    public static String convertObjToString(Object clsObj) {
+        //convert object  to string json
+        String jsonSender = new Gson().toJson(clsObj, new TypeToken<Object>() {
+        }.getType());
+        return jsonSender;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_item);
         mAuth = FirebaseAuth.getInstance();
-        itemid = getIntent().getStringExtra("iditem");
-        itemstring = getIntent().getStringExtra("itemasstring");
-        item = convertStringToObj(itemstring, Item.class);
+        itemid = getIntent().getStringExtra("itemid");
         groupid = getIntent().getStringExtra("idgroup");
-
+        itemstring = getIntent().getStringExtra("itemasstring");
 
         name = findViewById(R.id.editname);
         desc = findViewById(R.id.editdescription);
         edit = findViewById(R.id.editbtn);
+        img = findViewById(R.id.imageView111);
+
 
 
         ValueEventListener postListener = new ValueEventListener() {
@@ -83,6 +90,10 @@ public class ViewItem extends AppCompatActivity {
                 if(mAuth.getCurrentUser().getPhoneNumber().substring(1).matches(admin.substring(1))){
                     edit.setVisibility(View.VISIBLE);
                 }
+
+
+
+
             }
 
             @Override
@@ -92,42 +103,61 @@ public class ViewItem extends AppCompatActivity {
         };
         usersTable.addListenerForSingleValueEvent(postListener);
 
+        ValueEventListener ppostListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("groups").child(groupid).child("items").child(itemid).getValue(Item.class)!=null)
+                    item = dataSnapshot.child("groups").child(groupid).child("items").child(itemid).getValue(Item.class);
+                else
+                    item = convertStringToObj(itemstring,Item.class);
+                name.setText(item.getName());
+                desc.setText(item.getDesc());
+                if (item.getImagelink() != null) {
+                    String imgid = item.getImagelink();
+                    StorageReference imageRef = storageRef.child("/images/" + imgid);
+                    String ext = imgid.substring(imgid.lastIndexOf("."));
+                    final long ONE_MEGABYTE = 1024 * 1024;
+                    try {
+                        File localFile = File.createTempFile("images", ext);
+                        imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                            @Override
+                            public void onSuccess(byte[] bytes) {
+                                Bitmap myBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                img.setImageBitmap(myBitmap);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle any errors
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-        name.setText(item.getName());
-        desc.setText(item.getDesc());
-        if (item.getImagelink() != null) {
-            String imgid = item.getImagelink();
-            StorageReference imageRef = storageRef.child("/images/" + imgid);
-            String ext = imgid.substring(imgid.lastIndexOf("."));
-            final long ONE_MEGABYTE = 1024 * 1024;
-            try {
-                File localFile = File.createTempFile("images", ext);
-                imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        Bitmap myBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        img.setImageBitmap(myBitmap);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                }
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        }
+            }
+
+        };
+        usersTable.addValueEventListener(ppostListener);
+
+
+
 
     }
         public void edit(View v){
+
             Intent i = new Intent(getApplicationContext(), com.example.listapp2.item.NewItemActivity.class);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             i.putExtra("idgroup",groupid);
             i.putExtra("iditem","item"+item.getId());
-            i.putExtra("itemasstring",itemstring);
+            i.putExtra("itemasstring",convertObjToString(item));
             startActivity(i);
 
 
@@ -146,12 +176,7 @@ public class ViewItem extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        Intent i = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
-
-        i.putExtra("idgroup",groupid);
-        i.putExtra("itemstring",itemstring);
-        startActivity(i); finish();
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+         finish();
 
     }
 }

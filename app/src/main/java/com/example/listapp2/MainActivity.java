@@ -2,11 +2,16 @@ package com.example.listapp2;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +36,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 public class MainActivity extends AppCompatActivity {
 
     DatabaseReference usersTable=FirebaseDatabase.getInstance().getReference(); //myDB
@@ -39,20 +48,54 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    public void checkPermission(String permission, int requestCode)
+    {
+
+        // Checking if permission is not granted
+        if (ContextCompat.checkSelfPermission(
+                MainActivity.this,
+                permission)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat
+                    .requestPermissions(
+                            MainActivity.this,
+                            new String[] { permission },
+                            requestCode);
+        }
+
+    }
+
+
+    public void signn(View v){
+        sign();
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Context thisActivity=this;
+        boolean a =(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
+        boolean b =(ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
+        boolean c =(ContextCompat.checkSelfPermission(thisActivity, READ_CONTACTS) != PackageManager.PERMISSION_GRANTED);
+        while (a&&b&&c){
+            checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,100);
+            checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,101);
+            checkPermission(Manifest.permission.READ_CONTACTS,102);
+
+            a = (ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
+            b = (ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
+            c = (ContextCompat.checkSelfPermission(thisActivity, READ_CONTACTS) != PackageManager.PERMISSION_GRANTED);
+        }
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             // already signed in
-            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+            Intent i = new Intent(getApplicationContext(), NewHomeActivity.class);
             startActivity(i);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
-        } else {
-            sign();
         }
 
     }
@@ -113,7 +156,7 @@ public void sign(){
                     Dialog();
                 }
                 else {
-                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                    Intent i = new Intent(getApplicationContext(), NewHomeActivity.class);
                     startActivity(i);
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 }
@@ -163,7 +206,7 @@ public void sign(){
                     User newuser = new User(user.getPhoneNumber(),strname);
                     usersTable.child("users").child(user.getPhoneNumber()).setValue(newuser);
                     alertDialog.dismiss();
-                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                    Intent i = new Intent(getApplicationContext(), NewHomeActivity.class);
                     startActivity(i);
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 }
