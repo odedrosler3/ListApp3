@@ -22,8 +22,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/myRecycler"
-        android:layout_width="401dp"
-        android:layout_height="364dp"
+        android:layout_width="360dp"
+        android:layout_height="368dp"
         android:layout_marginTop="120dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,12 +46,11 @@
         android:id="@+id/items"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="items"
+        android:text="items:"
         app:layout_constraintBottom_toTopOf="@+id/myRecycler"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintHorizontal_bias="0.069"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/addbtn"
@@ -82,13 +81,15 @@
 
     <TextView
         android:id="@+id/textcontacts"
-        android:layout_width="398dp"
-        android:layout_height="60dp"
+        android:layout_width="353dp"
+        android:layout_height="66dp"
+        android:layout_marginStart="36dp"
         android:layout_marginTop="5dp"
         android:text="only me"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constraintBottom_toTopOf="@+id/myRecycler"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/groupname"
-        app:layout_constraintVertical_bias="0.212" />
+        app:layout_constraintVertical_bias="0.224" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

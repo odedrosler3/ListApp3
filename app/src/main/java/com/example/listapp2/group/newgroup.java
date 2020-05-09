@@ -9,15 +9,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.listapp2.NewHome.NewHomeActivity;
 import com.example.listapp2.R;
 import com.example.listapp2.data.Contact;
 import com.example.listapp2.data.Group;
-import com.example.listapp2.itemlist.itemlist;
+import com.example.listapp2.data.Item;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,23 +59,22 @@ public class newgroup extends AppCompatActivity {
     private FirebaseAuth mAuth; //myAuth
     private String extgroupid;
     List<Contact> contactlist;
-
-
-
+    HashMap<String, Item> olditemlist;
+    Button savebtn;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_newgroup);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-        setContentView(R.layout.activity_newgroup);
         extgroupid=getIntent().getStringExtra("idgroup");
         name = findViewById(R.id.editnameg);
         mAuth = FirebaseAuth.getInstance();
-
+        savebtn=findViewById(R.id.addbtn3);
         userphone = mAuth.getCurrentUser().getPhoneNumber();
         recyclerView = (RecyclerView) findViewById(R.id.myRecycler);
 
@@ -95,6 +97,7 @@ public class newgroup extends AppCompatActivity {
                     // Get Post object and use the values to update the UI
                         Group g = dataSnapshot.child("groups").child(extgroupid).getValue(Group.class);
                         name.setText(g.getname());
+                        olditemlist = g.getItems();
                         contactlist = g.getContacts();
                     mAdapter = new MyAdaptergroup(contactlist);
                     recyclerView.setAdapter(mAdapter);
@@ -109,7 +112,37 @@ public class newgroup extends AppCompatActivity {
                 usersTable.addListenerForSingleValueEvent(postListener);
 
 
+        final EditText namee = findViewById(R.id.editnameg);
+        namee.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (s.toString().length() > 0){
+                    savebtn.setEnabled(true);
+                } else {
+                    savebtn.setEnabled(false);
+                }
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().length() > 0){
+                    savebtn.setEnabled(true);
+                } else {
+                    savebtn.setEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() > 0){
+                    savebtn.setEnabled(true);
+                } else {
+                    namee.setError("name required");
+                    savebtn.setEnabled(false);
+                }
+            }
+        });
 
     }
 
@@ -159,8 +192,15 @@ public class newgroup extends AppCompatActivity {
                     {
                         String name = results.get(i).getDisplayName();
                         String phone = results.get(i).getPhoneNumbers().get(0).getNumber();
+                        char[] ch = phone.toCharArray();
+                        if(ch[0]=='+'){
                         Contact c = new Contact(name, phone);
-                        contactlist.add(c);
+                        contactlist.add(c);}
+                        else{
+                            String newphone= "+972"+phone.substring(1);
+                            Contact c = new Contact(name, newphone);
+                            contactlist.add(c);}
+                        }
                     }
                     mAdapter = new MyAdaptergroup(contactlist);
                     recyclerView.setAdapter(mAdapter);
@@ -168,11 +208,12 @@ public class newgroup extends AppCompatActivity {
 
             } else if(resultCode == RESULT_CANCELED){
             }
-        }
+
     }
     String namestr;
     Group g;
     Long id;
+    String phone;
     public void save(View v) throws ExecutionException, InterruptedException {
         setContentView(R.layout.activity_newgroup);
 
@@ -194,13 +235,20 @@ public class newgroup extends AppCompatActivity {
                         }
                         else{
                             id = Long.parseLong(extgroupid.substring(5));
-                            g = new Group(id, namestr, contactlist, userphone);
+                            g = new Group(id, namestr, contactlist, olditemlist,userphone);
                             usersTable.child("groups").child("group" + id).setValue(g);
                         }
                         if(contactlist!=null){
                         for(int i = 0; i<contactlist.size(); i++)
                         {
-                            final String phone = contactlist.get(i).getPhonenumber();
+                             phone = contactlist.get(i).getPhonenumber();
+                            if(!phone.contains("+972")){
+                                phone= "+972"+phone.substring(1);
+                            }
+                            if(phone.contains("-")){
+                                phone.replace("-", "");
+                            }
+
                             final DocumentReference groupsRef = db.collection("groups").document(phone);
                             groupsRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override

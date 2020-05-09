@@ -135,8 +135,11 @@ public class itemlist extends AppCompatActivity {
                 name.setText(group.getname());}
                 if(group.getContacts()!=null&&checkedcontact==false)
                 {
+                    if(!group.getAdmin().equals(userphone))
+                    textcon =textcon+dataSnapshot.child("users").child(group.getAdmin()).child("name").getValue()+", ";
                     for(int i=0; i<group.getContacts().size();i++){
-                        textcon =textcon+group.getContacts().get(i).getNickname()+", " ;}
+                        if(!group.getContacts().get(i).getPhonenumber().equals(userphone)){
+                        textcon =textcon+group.getContacts().get(i).getNickname()+", " ;}}
                 contactstxt.setText(textcon.substring(0,textcon.lastIndexOf(",")));
                     checkedcontact = true;
                 }

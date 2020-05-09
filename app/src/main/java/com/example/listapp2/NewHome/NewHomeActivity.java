@@ -67,7 +67,7 @@ public class NewHomeActivity extends AppCompatActivity {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                username.setText("hay "+dataSnapshot.child("users").child(phone).child("name").getValue().toString()+"!");
+                username.setText("hey "+dataSnapshot.child("users").child(phone).child("name").getValue().toString()+"!");
 
                 recyclerViewmy = (RecyclerView) findViewById(R.id.myRecycler);
 

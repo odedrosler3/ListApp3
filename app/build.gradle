@@ -20,7 +20,7 @@ android {
         }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        minSdkVersion 19
+        minSdkVersion 26
     }
 
     buildTypes {

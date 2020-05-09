@@ -1,6 +1,7 @@
 package com.example.listapp2;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -12,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,48 +49,46 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth; //myAuth
     private static final int RC_SIGN_IN = 123;
 
-
-
-    public void checkPermission(String permission, int requestCode)
-    {
-
-        // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(
-                MainActivity.this,
-                permission)
-                == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat
-                    .requestPermissions(
-                            MainActivity.this,
-                            new String[] { permission },
-                            requestCode);
-        }
-
-    }
-
+    private String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS};
 
     public void signn(View v){
         sign();
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private boolean arePermissionsEnabled(){
+        for(String permission : permissions){
+            if(checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
+                return false;
+        }
+        return true;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void requestMultiplePermissions(){
+        List<String> remainingPermissions = new ArrayList();
+        for (String permission : permissions) {
+            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                remainingPermissions.add(permission);
+            }
+        }
+        requestPermissions(remainingPermissions.toArray(new String[remainingPermissions.size()]), 101);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Context thisActivity=this;
-        boolean a =(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
-        boolean b =(ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
-        boolean c =(ContextCompat.checkSelfPermission(thisActivity, READ_CONTACTS) != PackageManager.PERMISSION_GRANTED);
-        while (a&&b&&c){
-            checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,100);
-            checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,101);
-            checkPermission(Manifest.permission.READ_CONTACTS,102);
 
-            a = (ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
-            b = (ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
-            c = (ContextCompat.checkSelfPermission(thisActivity, READ_CONTACTS) != PackageManager.PERMISSION_GRANTED);
-        }
+            if(arePermissionsEnabled()){
+            }else {
+                requestMultiplePermissions();
+            }
+
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {

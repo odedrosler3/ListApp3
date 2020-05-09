@@ -9,6 +9,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -55,6 +57,7 @@ public class NewItemActivity extends Activity {
     String imagepath="";
     ImageView img1;
     Button delbtn;
+    Button savebtn;
     String groupid;
     String liststring;
     String extiditem;
@@ -67,6 +70,7 @@ public class NewItemActivity extends Activity {
     UploadTask uploadTask;
     DatabaseReference usersTable= FirebaseDatabase.getInstance().getReference(); //myDB
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     public static <T> T convertStringToObj(String strObj, Class<T> classOfT) {
         //convert string json to object
@@ -82,6 +86,7 @@ public class NewItemActivity extends Activity {
          desc = (EditText) findViewById(R.id.editdescription);
         img1 = findViewById(R.id.imageView111);
         delbtn = findViewById(R.id.delbtn);
+        savebtn = findViewById(R.id.savebtn);
         groupid=getIntent().getStringExtra("idgroup");
         extiditem=getIntent().getStringExtra("iditem");
         liststring =getIntent().getStringExtra("liststring");
@@ -119,23 +124,56 @@ public class NewItemActivity extends Activity {
 
                         }
                 }
+        name.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (s.toString().length() > 0){
+                    savebtn.setEnabled(true);
+                } else {
+                    savebtn.setEnabled(false);
+                }
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().length() > 0){
+                    savebtn.setEnabled(true);
+                } else {
+                    savebtn.setEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() > 0){
+                    savebtn.setEnabled(true);
+                } else {
+                    name.setError("name required");
+                    savebtn.setEnabled(false);
+                }
+            }
+        });
 
     }
 
     public void delimage(View v){
         delbtn.setVisibility(View.INVISIBLE);
-        img1.setVisibility(View.INVISIBLE);
+        img1.setImageBitmap(null);
         imagepath="";
     }
 
+
     public void addimage(View v){
-        ImagePicker.Companion.with(this)
-                .cropSquare()	//Crop image with Square aspect ratio
-                .compress(1024)			//Final image size will be less than 1 MB(Optional)
-                .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
-                .start();
+
+            ImagePicker.Companion.with(this)
+                    .cropSquare()    //Crop image with Square aspect ratio
+                    .compress(1024)            //Final image size will be less than 1 MB(Optional)
+                    .maxResultSize(1080, 1080)    //Final image resolution will be less than 1080 x 1080(Optional)
+                    .start();
+
     }
+
     File img;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -207,7 +245,6 @@ public class NewItemActivity extends Activity {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
-
                         Uri file = Uri.fromFile(img);
                         String ext = file.getPath().substring(file.getPath().lastIndexOf("."));
                         StorageReference imagesRef = storage.getReference().child("/images");
