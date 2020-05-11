@@ -29,16 +29,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.wafflecopter.multicontactpicker.ContactResult;
 import com.wafflecopter.multicontactpicker.LimitColumn;
 import com.wafflecopter.multicontactpicker.MultiContactPicker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,10 +183,17 @@ public class newgroup extends AppCompatActivity {
                 for(int i=0; i<results.size(); i++)
                 {
                     String name = results.get(i).getDisplayName();
-                    String phone = "+972"+ results.get(i).getPhoneNumbers().get(0).getNumber().substring(1);
-
-                    Contact c = new Contact(name, phone);
-                    contactlist.add(c);
+                    String phone = results.get(i).getPhoneNumbers().get(0).getNumber();
+                    phone = phone.replace("-","");
+                    char[] ch = phone.toCharArray();
+                    if(ch[0]=='+'){
+                        Contact c = new Contact(name, phone);
+                        contactlist.add(c);}
+                    else{
+                        String newphone= "+972"+phone.substring(1);
+                        Contact c = new Contact(name, newphone);
+                        contactlist.add(c);
+                    }
                 }
                 mAdapter = new MyAdaptergroup(contactlist);
                 recyclerView.setAdapter(mAdapter);}
@@ -192,6 +203,7 @@ public class newgroup extends AppCompatActivity {
                     {
                         String name = results.get(i).getDisplayName();
                         String phone = results.get(i).getPhoneNumbers().get(0).getNumber();
+                        phone = phone.replace("-","");
                         char[] ch = phone.toCharArray();
                         if(ch[0]=='+'){
                         Contact c = new Contact(name, phone);
@@ -227,60 +239,54 @@ public class newgroup extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
-                        if(extgroupid==null) {
-                             id = task.getResult().getLong("groupid");
+                        if (extgroupid == null) {
+                            id = task.getResult().getLong("groupid");
                             g = new Group(id, namestr, contactlist, userphone);
                             usersTable.child("groups").child("group" + id).setValue(g);
                             docRef.update("groupid", id + 1);
-                        }
-                        else{
+                        } else {
                             id = Long.parseLong(extgroupid.substring(5));
-                            g = new Group(id, namestr, contactlist, olditemlist,userphone);
+                            g = new Group(id, namestr, contactlist, olditemlist, userphone);
                             usersTable.child("groups").child("group" + id).setValue(g);
                         }
-                        if(contactlist!=null){
-                        for(int i = 0; i<contactlist.size(); i++)
-                        {
-                             phone = contactlist.get(i).getPhonenumber();
-                            if(!phone.contains("+972")){
-                                phone= "+972"+phone.substring(1);
-                            }
-                            if(phone.contains("-")){
-                                phone.replace("-", "");
-                            }
 
-                            final DocumentReference groupsRef = db.collection("groups").document(phone);
-                            groupsRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        if(task.getResult().exists()) {
-                                            db.collection("groups").document(phone).update("groups", FieldValue.arrayUnion("group"+id));
-                                        }
-                                        else{
-                                            Map<String, Object> docData = new HashMap<>();
-                                            docData.put("groups", Arrays.asList("group"+id));
-                                            Task<Void> future = db.collection("groups").document(phone).set(docData);
-                                        }
+                        db.collection("groups").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (int i = 0; i < contactlist.size(); i++) {
+                                        phone = contactlist.get(i).getPhonenumber();
+                                            db.collection("groups").document(phone).update("groups", FieldValue.arrayUnion("group" + id));
+                                         //   Map<String, Object> docData = new HashMap<>();
+                                           // docData.put("groups", Arrays.asList("group" + id));
+                                           // db.collection("groups").document(phone).set(docData, SetOptions.merge());
 
-                                        }
                                     }
-                                });
+                                    }
+                                }
 
-                        }}
-                    }
-                    if(extgroupid==null){
-                        Intent i = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
-                        i.putExtra("idgroup","group"+id);
-                        startActivity(i); finish();}
-                    else {
-                    Intent i = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
-                    i.putExtra("idgroup",extgroupid);
-                    startActivity(i); finish();}
-                }});
+                               });
 
-}
 
+                        if (extgroupid == null) {
+                            Intent in = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
+                            in.putExtra("idgroup", "group" + id);
+                            startActivity(in);
+                            finish();
+                        } else {
+                            Intent in = new Intent(getApplicationContext(), com.example.listapp2.itemlist.itemlist.class);
+                            in.putExtra("idgroup", extgroupid);
+                            startActivity(in);
+                            finish();
+                        }
+
+
+                    } }});
+
+
+
+
+        }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) < 5
